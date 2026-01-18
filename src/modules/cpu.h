@@ -2,6 +2,7 @@
 #include "def.h"
 #include "ram.h"
 #include "stack.h"
+#include "screen.h"
 
 struct CPU
 {
@@ -20,6 +21,7 @@ struct CPU
     public:
     RAM ram;
     Stack stack;
+    Screen screen;
 
     CPU();
     

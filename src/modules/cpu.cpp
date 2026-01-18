@@ -3,10 +3,12 @@
 #include "casts.h"
 
 #include <cmath>
+#include <unistd.h> // UNIX-only. Should add macro to support windows
 
 // This is an approximation (floored to 5.54 because there is no other ln from 0-254 like it, at most they are 5.53)
 #define BYTE_LN         5.54 
 #define STACK_ADDRESS   0xcf00
+#define SCREEN_ADDRESS  0xa000
 #define REGISTERS       8
 
 typedef unsigned char byte;
@@ -32,13 +34,14 @@ void CPU::update_flags_with_number(int64_t num)
 }
 
 CPU::CPU()
-: ram(RAM()), stack(Stack(&(ram.memory[STACK_ADDRESS]))), zero(false), underflow(false), overflow(false) 
+: ram(RAM()), stack(Stack(&(ram.memory[STACK_ADDRESS]))), screen(Screen(&(ram.memory[SCREEN_ADDRESS]))), zero(false), underflow(false), overflow(false) 
 {
     registers = new byte[REGISTERS]();
 }
 
 int CPU::tick() { // Gotta make it DRY, cause a lot of repetition in it. (like the register and immediates)
     byte opcode = ram.next();
+
     switch (opcode) {
         case 0x00: {return -1;} // NOP
         case 0x01: { // MOV $x, $y
@@ -401,6 +404,26 @@ int CPU::tick() { // Gotta make it DRY, cause a lot of repetition in it. (like t
             *register_x = (byte)result;
             return -1;
         }
+        case 0x4e: { // MOD $x, $y
+            byte* register_x = get_next_as_register();
+            byte* register_y = get_next_as_register();
+
+            uint64_t result = (uint64_t)*register_x % (uint64_t)*register_y;
+            update_flags_with_number(result);
+
+            *register_x = (byte)result;
+            return -1;
+        }
+        case 0x4f: { // MOD $x, #0
+            byte* register_x = get_next_as_register();
+            byte immediate = ram.next();
+
+            uint64_t result = (uint64_t)*register_x % (uint64_t)immediate;
+            update_flags_with_number(result);
+
+            *register_x = (byte)result;
+            return -1;
+        }
         case 0x50: { // CALL [#0]
             uint16_t immediate = ram.next_16bit_immediate();
             
@@ -429,6 +452,44 @@ int CPU::tick() { // Gotta make it DRY, cause a lot of repetition in it. (like t
             
             return -1;
         }
+        case 0x60: { // STORE [$x,$y], $z
+            uint16_t addr = bytes_to_uint16(
+                *get_next_as_register(),
+                *get_next_as_register()
+            );
+            byte* register_z = get_next_as_register();
+
+            ram.write(addr, *register_z);
+            return -1;
+        }
+        case 0x61: { // STORE [#0], $x
+            uint16_t addr = ram.next_16bit_immediate();
+            byte* register_x = get_next_as_register();
+
+            ram.write(addr, *register_x);
+            return -1;
+        }
+        case 0x62: { // STORE [$x,$y], #0
+            uint16_t addr = bytes_to_uint16(
+                *get_next_as_register(),
+                *get_next_as_register()
+            );
+            byte immediate = ram.next();
+
+            ram.write(addr, immediate);
+            return -1;
+        }
+        case 0x63: { // STORE [#0], #1
+            uint16_t addr = ram.next_16bit_immediate();
+            byte immediate = ram.next();
+
+            ram.write(addr, immediate);
+            return -1;
+        }
+        case 0xdb: {
+            sleep(600);
+            return -1;
+        }
         case 0xfd: { // HALT $x
             byte* register_x = get_next_as_register();
             
@@ -453,5 +514,7 @@ int CPU::run() {
         if (res != -1) {
             return res;
         }
+
+        screen.tick();
     }
 }

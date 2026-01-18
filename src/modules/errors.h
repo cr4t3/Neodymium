@@ -5,6 +5,7 @@
 
 enum struct Errors : byte{ // May add others just in case
     SIGABRT             =   6,
+    SIGKILL             =   9,
     SIGSEGV             =   11,
     // Non-signal errors (1-128)
     OS_UNSUPPORTED      =   NON_SIGNAL_PREFIX + 1,

@@ -9,3 +9,5 @@ CMakeCache.txt
 Makefile
 CMakeFiles/
 archive.md
+changelog.md
+test*.bin

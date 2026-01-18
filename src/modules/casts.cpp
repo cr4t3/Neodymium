@@ -2,7 +2,11 @@
 #include "casts.h"
 
 uint16_t bytes_to_uint16(byte x, byte y) {
-    return ((uint16_t)x << 8) + (uint16_t)y;
+    byte buf[] = {x, y};
+    uint16_t result;
+    std::memcpy(&result, buf, sizeof(buf));
+
+    return result;
 }
 
 bytes uint16_to_bytes(uint16_t x) {

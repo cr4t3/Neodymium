@@ -51,16 +51,16 @@ neodymium file.bin
 ```
 
 ## Roadmap
-* [ ] Add a virtual screen
+* [x] ~~Add a virtual screen~~
 * [ ] Make a C++ assembler
 * [ ] Add unit testing
 * [ ] Add example bins
 * [ ] Add a virtual keyboard
 * [ ] Add a virtual ROM (file-loadble)
 * [ ] Add a virtual HDD (static file)
-* [ ] Add more instructions
+* [x] ~~Add more instructions~~
 
-## Technical Execution Requirements
+## Minimal Requirements
 
 * 128 KB of RAM memory
 * 1 CPU core
