@@ -26,15 +26,19 @@ git clone https://www.github.com/cr4t3/Neodymium.git
 cd Neodymium
 ```
 
-2. Create the cache and make the binary
+2. Create a build folder and move there
 ```bash
-cmake .
+mkdir build
+cd build
+```
+
+3. Create the cache and make the binary
+```bash
+cmake ..
 cmake --build .
 ```
 
-3. Move binary "neodymium" to a comfortable location.
-
-4. Verify if Neodymium is installed.
+1. Verify if Neodymium is installed in it's newest version.
 ```bash
 neodymium --version
 ```
@@ -76,8 +80,7 @@ Neither here -->
 
 ## Version History
 
-* 0.1.0
-    * Initial Release
+Read the version history at the [Releases](https://github.com/cr4t3/Neodymium/releases) tab.
 
 ## License
 
