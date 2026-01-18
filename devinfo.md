@@ -61,9 +61,15 @@ PWR \$x, #0      | 0x4a  | \$x ** #0 -> \$x
 PWR \$x, \$y      | 0x4b  | \$x ** \$y -> \$x
 SQRT \$x         | 0x4c  | sqrt($x) -> \$x
 FSQRT \$x        | 0x4d  | sqrt($x) -> \$x
+MOD \$x, \$y          | 0x4e  | \$x % \$y -> \$x
+MOD \$x, #0          | 0x4f  | \$x % #0 -> \$x
 CALL [#0]       | 0x50  | -
 CALL [\$x, \$y]   | 0x51  | -
 RET             | 0x52  | -
+STORE [\$x, \$y], $z  | 0x60  | \$z -> [\$x,\$y]
+STORE [#0], $x      | 0x61  | $x -> [#0]
+STORE [\$x, \$y], #0  | 0x62  | #0 -> [\$x,\$y]
+STORE [#0], #1      | 0x63  | #1 -> [#0]
 HALT \$x         | 0xfd  | -
 HALT #0         | 0xfe  | -
 HALT            | 0xff  | -
