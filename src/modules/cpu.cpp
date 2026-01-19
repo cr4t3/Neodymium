@@ -486,10 +486,6 @@ int CPU::tick() { // Gotta make it DRY, cause a lot of repetition in it. (like t
             ram.write(addr, immediate);
             return -1;
         }
-        case 0xdb: {
-            sleep(600);
-            return -1;
-        }
         case 0xfd: { // HALT $x
             byte* register_x = get_next_as_register();
             
