@@ -15,6 +15,7 @@ Neodymium VM is a 8-bit virtual machine, which simulates a CPU, RAM (up to 64KB)
 
 * C++17 or higher.
 * CMake 3.31.6 or higher.
+* GLFW 3.4 or higher.
 * Any compiler that supports C++17 standard.
 * A UNIX-based OS. *(Windows is currently unsupported for use and compile)*
 
