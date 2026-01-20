@@ -16,7 +16,7 @@
 #error "Windows is currently not supported"
 #endif
 
-#define VERSION "Neodymium VM v0.2.1 (build 4)"
+#define VERSION "Neodymium VM v0.2.2 (build 5)"
 
 #include <iostream>
 #include <fstream>

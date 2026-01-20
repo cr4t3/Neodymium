@@ -11,9 +11,6 @@
 #define SCREEN_ADDRESS  0xa000
 #define REGISTERS       8
 
-typedef unsigned char byte;
-typedef byte* bytes;
-
 byte* CPU::get_register_by_address(byte addr)
 {
     if (addr == 0xff) return &ALWAYS_ZERO; // Returns a pointer to a new byte which can be modified, but no modification with update it, also, it's always zero
@@ -102,10 +99,12 @@ int CPU::tick() { // Gotta make it DRY, cause a lot of repetition in it. (like t
             return -1;
         }
         case 0x21: { // JMP [$x,$y]
-            byte* register_x = get_next_as_register();
-            byte* register_y = get_next_as_register();
+            uint16_t addr = bytes_to_uint16(
+                *(get_next_as_register()),
+                *(get_next_as_register())
+            );
             
-            ram.pc = ((uint16_t)*register_x<<8) + (uint16_t)*register_y;
+            ram.pc = addr;
             return -1;
         }
         case 0x22: { // CMP $x, #0
@@ -133,10 +132,12 @@ int CPU::tick() { // Gotta make it DRY, cause a lot of repetition in it. (like t
             return -1;
         }
         case 0x25: { // JZ [$x,$y]
-            byte* register_x = get_next_as_register();
-            byte* register_y = get_next_as_register();
+            uint16_t addr = bytes_to_uint16(
+                *(get_next_as_register()),
+                *(get_next_as_register())
+            );
             
-            if(zero) ram.pc = ((uint16_t)*register_x<<8) + (uint16_t)*register_y;
+            if(zero) ram.pc = addr;
             return -1;
         }
         case 0x26: { // JNZ [#0]
@@ -146,10 +147,12 @@ int CPU::tick() { // Gotta make it DRY, cause a lot of repetition in it. (like t
             return -1;
         }
         case 0x27: { // JNZ [$x,$y]
-            byte* register_x = get_next_as_register();
-            byte* register_y = get_next_as_register();
+            uint16_t addr = bytes_to_uint16(
+                *(get_next_as_register()),
+                *(get_next_as_register())
+            );
             
-            if(!zero) ram.pc = ((uint16_t)*register_x<<8) + (uint16_t)*register_y;
+            if(!zero) ram.pc = addr;
             return -1;
         }
         case 0x28: { // JU [#0]
@@ -159,10 +162,12 @@ int CPU::tick() { // Gotta make it DRY, cause a lot of repetition in it. (like t
             return -1;
         }
         case 0x29: { // JU [$x,$y]
-            byte* register_x = get_next_as_register();
-            byte* register_y = get_next_as_register();
+            uint16_t addr = bytes_to_uint16(
+                *(get_next_as_register()),
+                *(get_next_as_register())
+            );
             
-            if(underflow) ram.pc = ((uint16_t)*register_x<<8) + (uint16_t)*register_y;
+            if(underflow) ram.pc = addr;
             return -1;
         }
         case 0x2a: { // JNU [#0]
@@ -172,10 +177,12 @@ int CPU::tick() { // Gotta make it DRY, cause a lot of repetition in it. (like t
             return -1;
         }
         case 0x2b: { // JNU [$x,$y]
-            byte* register_x = get_next_as_register();
-            byte* register_y = get_next_as_register();
+            uint16_t addr = bytes_to_uint16(
+                *(get_next_as_register()),
+                *(get_next_as_register())
+            );
             
-            if(!underflow) ram.pc = ((uint16_t)*register_x<<8) + (uint16_t)*register_y;
+            if(!underflow) ram.pc = addr;
             return -1;
         }
         case 0x2c: { // JO [#0]
@@ -185,10 +192,12 @@ int CPU::tick() { // Gotta make it DRY, cause a lot of repetition in it. (like t
             return -1;
         }
         case 0x2d: { // JO [$x,$y]
-            byte* register_x = get_next_as_register();
-            byte* register_y = get_next_as_register();
+            uint16_t addr = bytes_to_uint16(
+                *(get_next_as_register()),
+                *(get_next_as_register())
+            );
             
-            if(overflow) ram.pc = ((uint16_t)*register_x<<8) + (uint16_t)*register_y;
+            if(overflow) ram.pc = addr;
             return -1;
         }
         case 0x2e: { // JNO [#0]
@@ -198,10 +207,12 @@ int CPU::tick() { // Gotta make it DRY, cause a lot of repetition in it. (like t
             return -1;
         }
         case 0x2f: { // JNO [$x,$y]
-            byte* register_x = get_next_as_register();
-            byte* register_y = get_next_as_register();
+            uint16_t addr = bytes_to_uint16(
+                *(get_next_as_register()),
+                *(get_next_as_register())
+            );
             
-            if(!overflow) ram.pc = ((uint16_t)*register_x<<8) + (uint16_t)*register_y;
+            if(!overflow) ram.pc = addr;
             return -1;
         }
         case 0x30: { // PUSH $x
