@@ -11,3 +11,4 @@ CMakeFiles/
 archive.md
 changelog.md
 test*.bin
+main_*.cpp

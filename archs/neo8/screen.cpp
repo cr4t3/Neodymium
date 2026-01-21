@@ -1,5 +1,5 @@
 #include "screen.h"
-#include "errors.h"
+#include "../../globals/errors.h"
 
 Screen::Screen(byte* addr_ptr) 
 {

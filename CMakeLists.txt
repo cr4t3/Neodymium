@@ -6,11 +6,26 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_FLAGS_DEBUG "-g")
 
-find_package(OpenGL REQUIRED)
-find_package(glfw3 3.4 REQUIRED)
+if(NOT DEFINED ARCH)
+    set(ARCH neo8)
+endif()
+
+if(EXISTS ${PROJECT_SOURCE_DIR}/archs/${ARCH}/${ARCH}.cmake)
+    include(${PROJECT_SOURCE_DIR}/archs/${ARCH}/${ARCH}.cmake)
+else()
+    message(FATAL_ERROR "${ARCH}.CMAKE file not found")
+endif()
 
 file(GLOB_RECURSE CXXMODULES ${PROJECT_SOURCE_DIR}/src/modules/*.cpp) 
+file(GLOB_RECURSE MAIN_CXX   ${PROJECT_SOURCE_DIR}/src/main_${ARCH}.cpp)
+file(GLOB_RECURSE GLOBALS    ${PROJECT_SOURCE_DIR}/globals/*.cpp)
 
-add_executable(${PROJECT_NAME} ${PROJECT_SOURCE_DIR}/src/main.cpp ${CXXMODULES})
+configure_file(${PROJECT_SOURCE_DIR}/src/main.cpp.in ${PROJECT_SOURCE_DIR}/src/main_${ARCH}.cpp @ONLY)
 
-target_link_libraries(${PROJECT_NAME} PRIVATE OpenGL::GL glfw)
+file(GLOB_RECURSE ARCH_LOC       ${PROJECT_SOURCE_DIR}/archs/${ARCH}/*.cpp)
+
+add_executable("${PROJECT_NAME}-${ARCH}" ${MAIN_CXX} ${CXXMODULES} ${ARCH_LOC} ${GLOBALS})
+
+if(DEFINED REQ_LIBRARIES)
+    target_link_libraries("${PROJECT_NAME}-${ARCH}" PRIVATE ${REQ_LIBRARIES})
+endif()

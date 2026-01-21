@@ -3,11 +3,15 @@
 
 # Neodymium Virtual Machine 
 
-An open-source 8-bit virtual machine.
+An open-source virtualizer with custom and modular architectures.
 
 ## Description
 
-Neodymium VM is a 8-bit virtual machine, which simulates a CPU, RAM (up to 64KB) and in-RAM stack. It's uses range from virtualization to simple program making.
+Neodymium VM is a virtualizer, It's uses range from virtualization to simple program making.
+
+## Notice
+
+This release is considered to be an alpha release, expect changes and report issues on [GitHub Issue](https://github.com/cr4t3/Neodymium/issues).
 
 ## Getting Started
 
@@ -15,9 +19,11 @@ Neodymium VM is a 8-bit virtual machine, which simulates a CPU, RAM (up to 64KB)
 
 * C++17 or higher.
 * CMake 3.31.6 or higher.
-* GLFW 3.4 or higher.
 * Any compiler that supports C++17 standard.
 * A UNIX-based OS. *(Windows is currently unsupported for use and compile)*
+
+#### Neo8 dependencies
+* GLFW 3.4-3 or higher
 
 ### Installing
 
@@ -33,47 +39,32 @@ mkdir build
 cd build
 ```
 
-3. Create the cache and make the binary
+3. Create the cache and make the binary with the respective architecture
 ```bash
-cmake ..
+cmake .. -DARCH=[arch]
 cmake --build .
 ```
 
-1. Verify if Neodymium is installed in it's newest version.
+4. Verify if Neodymium is installed in it's newest version.
 ```bash
-neodymium --version
+neodymium-{arch} --version
 ```
 
 ### Executing program
 
 1. Using a compiled bin file, you can execute
 ```bash
-neodymium file.bin
+neodymium-[arch] file.bin
 ```
-
-## Roadmap
-* [x] ~~Add a virtual screen~~
-* [ ] Make a C++ assembler
-* [ ] Add unit testing
-* [ ] Add example bins
-* [ ] Add a virtual keyboard
-* [ ] Add a virtual ROM (file-loadble)
-* [ ] Add a virtual HDD (static file)
-* [x] ~~Add more instructions~~
 
 ## Minimal Requirements
 
-* 128 KB of RAM memory
 * 1 CPU core
-* 8 MB storage.
+* 1 MB storage.
 
-<!--## Known Issues
+## Known Issues
 
-Nothin here yet
-
-## Help
-
-Neither here -->
+None yet
 
 ## Authors
 

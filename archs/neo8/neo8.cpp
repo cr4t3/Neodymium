@@ -1,42 +1,33 @@
-#include "cpu.h"
-#include "errors.h"
-#include "casts.h"
-
+#include "neo8.h"
+#include <iostream>
 #include <cmath>
-#include <unistd.h> // UNIX-only. Should add macro to support windows
 
-// This is an approximation (floored to 5.54 because there is no other ln from 0-254 like it, at most they are 5.53)
-#define BYTE_LN         5.54 
 #define STACK_ADDRESS   0xcf00
 #define SCREEN_ADDRESS  0xa000
 #define REGISTERS       8
 
-byte* CPU::get_register_by_address(byte addr)
-{
-    if (addr == 0xff) return &ALWAYS_ZERO; // Returns a pointer to a new byte which can be modified, but no modification with update it, also, it's always zero
-    if(addr >= REGISTERS) raise(Errors::SIGSEGV);
-    return &registers[addr];
+typedef std::ifstream ifstream;
+
+Arch::Arch() : version("Neo8 v0.1.0"), ram(RAM()), stack(Stack(&ram.memory[STACK_ADDRESS])), screen(Screen(&ram.memory[SCREEN_ADDRESS])) {
+    screen.tick();
 };
 
-byte* CPU::get_next_as_register() 
+void Arch::input_file(std::ifstream* in, off_t size) 
 {
-    return get_register_by_address(ram.next());
+    if (size > 0x10000) {
+        raise(Errors::FILE_TOO_BIG);
+    }
+
+    for (int i = 0; i < size; i++) {
+        byte b;
+        in->read((char*)&b, sizeof(b));
+        
+        ram.write(i, b);
+    }
 }
 
-void CPU::update_flags_with_number(int64_t num)
+int Arch::tick()
 {
-    overflow    = num > 255;
-    zero        = num == 0;
-    underflow   = num < 0; 
-}
-
-CPU::CPU()
-: ram(RAM()), stack(Stack(&(ram.memory[STACK_ADDRESS]))), screen(Screen(&(ram.memory[SCREEN_ADDRESS]))), zero(false), underflow(false), overflow(false) 
-{
-    registers = new byte[REGISTERS]();
-}
-
-int CPU::tick() { // Gotta make it DRY, cause a lot of repetition in it. (like the register and immediates)
     byte opcode = ram.next();
 
     switch (opcode) {
@@ -64,12 +55,12 @@ int CPU::tick() { // Gotta make it DRY, cause a lot of repetition in it. (like t
         }
         case 0x04: { // MOV $x, [$y, $z]
             byte* register_x = get_next_as_register();
-            byte* register_y = get_next_as_register();
-            byte* register_z = get_next_as_register();
-            
-            *register_x = ram.get_from_address(
-                bytes_to_uint16(*register_y, *register_z)
+            uint16_t addr = bytes_to_uint16(
+                *(get_next_as_register()),
+                *(get_next_as_register())
             );
+            
+            *register_x = ram.get_from_address(addr);
             return -1;
         }
         case 0x10: { // NOT $x
@@ -335,87 +326,7 @@ int CPU::tick() { // Gotta make it DRY, cause a lot of repetition in it. (like t
             *register_x = (byte)result;
             return -1;
         }
-        case 0x4a: { // PWR $x, #0
-            byte* register_x = get_next_as_register();
-            byte immediate = ram.next();
-            
-            /* C++ returns trash values when a exponent or base is 0 so
-            *  it would be better to skip it, it also takes out the possibility of
-            *  a = 0, which would make ln(a) = -1 (due to C++ indicating an error)
-            */
-            if (immediate == 0 || *register_x == 0) {
-                raise(Errors::SIGABRT);
-            }
-            
-            double pow_size = (double)immediate * log((double)*register_x); // a**b > 255 = b*ln(a) > ln(255)
-            
-            overflow    = (pow_size > BYTE_LN);
-            underflow   = false;
-            zero        = false;
-            
-            double result = pow((double)*register_x, (double)immediate); // this gonna overflow heavily, it's unstopable.
-            
-            *register_x = (byte)result;
-            return -1;
-        }
-        case 0x4b: { // PWR $x, $y
-            byte* register_x = get_next_as_register();
-            byte* register_y = get_next_as_register();
-            
-            /* C++ returns trash values when a exponent or base is 0 so
-            *  it would be better to skip it, it also takes out the possibility of
-            *  a = 0, which would make ln(a) = -1 (due to C++ indicating an error)
-            */
-            if (*register_y == 0 || *register_x == 0) {
-                raise(Errors::SIGABRT);
-            }
-            
-            double pow_size = (double)*register_y * log((double)*register_x); // a**b > 255 = b*ln(a) > ln(255)
-            
-            overflow    = (pow_size > BYTE_LN);
-            underflow   = false;
-            zero        = false;
-            
-            double result = pow((double)*register_x, (double)*register_y); // this gonna overflow heavily, it's unstopable.
-            
-            *register_x = (byte)result;
-            return -1;
-        }
-        case 0x4c: { // SQRT $x
-            // Thanks Quake III
-            
-            byte* register_x = get_next_as_register();
-            
-            long i;
-            float x2, y;
-            
-            x2 = (float)*register_x * 0.5F;
-            y = (float)*register_x;
-            i = * (long*)&y;
-            i = 0x5f3759df - (i >> 1);
-            y = * (float*)&i;
-            y = y * (1.5F - (x2 * y * y));
-            
-            *register_x = (byte)round(1/y);
-            
-            overflow    = false;
-            underflow   = false;
-            zero        = (*register_x == 0);
-            return -1;
-        }
-        case 0x4d: { // FSQRT $x
-            byte* register_x = get_next_as_register();
-            
-            int64_t result = round(sqrt((double)*register_x));
-            
-            overflow    = false;
-            underflow   = false;
-            zero        = (result == 0);
-            
-            *register_x = (byte)result;
-            return -1;
-        }
-        case 0x4e: { // MOD $x, $y
+        case 0x4a: { // MOD $x, $y
             byte* register_x = get_next_as_register();
             byte* register_y = get_next_as_register();
 
@@ -425,7 +336,7 @@ int CPU::tick() { // Gotta make it DRY, cause a lot of repetition in it. (like t
             *register_x = (byte)result;
             return -1;
         }
-        case 0x4f: { // MOD $x, #0
+        case 0x4b: { // MOD $x, #0
             byte* register_x = get_next_as_register();
             byte immediate = ram.next();
 
@@ -446,8 +357,8 @@ int CPU::tick() { // Gotta make it DRY, cause a lot of repetition in it. (like t
         }
         case 0x51: { // CALL [$x,$y]
             uint16_t addr = bytes_to_uint16(
-                *get_next_as_register(),
-                *get_next_as_register()
+                *(get_next_as_register()),
+                *(get_next_as_register())
             );
             
             stack.push_16bit(ram.pc);
@@ -465,8 +376,8 @@ int CPU::tick() { // Gotta make it DRY, cause a lot of repetition in it. (like t
         }
         case 0x60: { // STORE [$x,$y], $z
             uint16_t addr = bytes_to_uint16(
-                *get_next_as_register(),
-                *get_next_as_register()
+                *(get_next_as_register()),
+                *(get_next_as_register())
             );
             byte* register_z = get_next_as_register();
 
@@ -482,8 +393,8 @@ int CPU::tick() { // Gotta make it DRY, cause a lot of repetition in it. (like t
         }
         case 0x62: { // STORE [$x,$y], #0
             uint16_t addr = bytes_to_uint16(
-                *get_next_as_register(),
-                *get_next_as_register()
+                *(get_next_as_register()),
+                *(get_next_as_register())
             );
             byte immediate = ram.next();
 
@@ -495,6 +406,11 @@ int CPU::tick() { // Gotta make it DRY, cause a lot of repetition in it. (like t
             byte immediate = ram.next();
 
             ram.write(addr, immediate);
+            return -1;
+        }
+        case 0x70: { // FLUSH
+            screen.tick();
+
             return -1;
         }
         case 0xfd: { // HALT $x
@@ -510,18 +426,26 @@ int CPU::tick() { // Gotta make it DRY, cause a lot of repetition in it. (like t
             return 0;
         }
     }
-    
+
     raise(Errors::SIGABRT);
-    return 0; // this wont run never (Cause raise calls exit()), but it makes g++ happy
+    return 0; // Makes the compiler happy, but won't execute because raise() exits
 }
 
-int CPU::run() {
-    while (true) {
-        int res = tick();
-        if (res != -1) {
-            return res;
-        }
+byte* Arch::get_register_by_address(byte addr)
+{
+    if (addr == 0xff) return &ALWAYS_ZERO; // Returns a pointer to a new byte which can be modified, but no modification with update it, also, it's always zero
+    if(addr >= REGISTERS) raise(Errors::SIGSEGV);
+    return &registers[addr];
+};
 
-        screen.tick();
-    }
+byte* Arch::get_next_as_register() 
+{
+    return get_register_by_address(ram.next());
+}
+
+void Arch::update_flags_with_number(int64_t num)
+{
+    overflow    = num > 255;
+    zero        = num == 0;
+    underflow   = num < 0; 
 }

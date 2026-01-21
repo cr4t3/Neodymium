@@ -1,7 +1,9 @@
 #pragma once
-#include "def.h"
+#include <stdint.h>
 
 #define NON_SIGNAL_PREFIX 128
+
+typedef uint8_t byte;
 
 enum struct Errors : byte{ // May add others just in case
     SIGABRT             =   6,
