@@ -39,6 +39,5 @@ uint16_t RAM::next_16bit_immediate()
 int RAM::write(uint16_t address, byte data) 
 {
     memory[address] = data;
-    if (memory[address] != data) return 1; // means error, but it's almost impossible this occurrs, i may deprecate this line
     return 0;
 };

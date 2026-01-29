@@ -1,0 +1,1 @@
+message(FATAL_ERROR "This architecture is not ready for compilation.")

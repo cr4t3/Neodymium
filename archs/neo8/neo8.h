@@ -1,7 +1,7 @@
 #pragma once
 #include "../../src/modules/arch.h"
 #include "../../globals/errors.h"
-#include "def.h"
+#include "../../globals/def.h"
 #include "casts.h"
 #include "screen.h"
 #include "ram.h"

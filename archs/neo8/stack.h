@@ -1,5 +1,5 @@
 #pragma once
-#include "def.h"
+#include "../../globals/def.h"
 
 struct Stack {
     private:

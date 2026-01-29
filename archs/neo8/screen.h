@@ -1,5 +1,5 @@
 #pragma once
-#include "def.h"
+#include "../../globals/def.h"
 #include <GLFW/glfw3.h>
 
 #define HEIGHT  16

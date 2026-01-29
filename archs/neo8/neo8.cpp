@@ -428,7 +428,7 @@ int Arch::tick()
     }
 
     raise(Errors::SIGABRT);
-    return 0; // Makes the compiler happy, but won't execute because raise() exits
+    return 0; // Makes the compiler happy, but won't execute because raise() exits the code
 }
 
 byte* Arch::get_register_by_address(byte addr)

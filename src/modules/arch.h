@@ -6,7 +6,7 @@ struct BaseArch
 {
     const char* version;
 
-    virtual int tick();
+    virtual int tick() = 0;
 
-    virtual void input_file(std::ifstream* in, off_t size);
+    virtual void input_file(std::ifstream* in, off_t size) = 0;
 };

@@ -24,8 +24,8 @@ configure_file(${PROJECT_SOURCE_DIR}/src/main.cpp.in ${PROJECT_SOURCE_DIR}/src/m
 
 file(GLOB_RECURSE ARCH_LOC       ${PROJECT_SOURCE_DIR}/archs/${ARCH}/*.cpp)
 
-add_executable(${PROJECT_NAME}_${ARCH} ${MAIN_CXX} ${CXXMODULES} ${ARCH_LOC} ${GLOBALS})
+add_executable(${PROJECT_NAME}-${ARCH} ${MAIN_CXX} ${CXXMODULES} ${ARCH_LOC} ${GLOBALS})
 
 if(DEFINED REQ_LIBRARIES)
-    target_link_libraries(${PROJECT_NAME}_${ARCH} PRIVATE ${REQ_LIBRARIES})
+    target_link_libraries(${PROJECT_NAME}-${ARCH} PRIVATE ${REQ_LIBRARIES})
 endif()
