@@ -68,7 +68,7 @@ None yet
 
 ## Authors
 
-[@cr4t3](github.com/cr4t3) - Crate
+[@cr4t3](https://www.github.com/cr4t3) - Crate
 
 ## Version History
 
