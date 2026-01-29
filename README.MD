@@ -47,14 +47,14 @@ cmake --build .
 
 4. Verify if Neodymium is installed in it's newest version.
 ```bash
-neodymium-{arch} --version
+./neodymium-{arch} --version
 ```
 
 ### Executing program
 
 1. Using a compiled bin file, you can execute
 ```bash
-neodymium-[arch] file.bin
+./neodymium-[arch] file.bin
 ```
 
 ## Minimal Requirements
