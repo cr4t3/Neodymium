@@ -29,7 +29,7 @@ This release is considered to be an alpha release, expect changes and report iss
 
 1. Clone the git repo and move to the folder
 ```bash
-git clone https://www.github.com/cr4t3/Neodymium.git 
+git clone https://www.github.com/cr4t3/Neodymium.git -b alpha
 cd Neodymium
 ```
 
